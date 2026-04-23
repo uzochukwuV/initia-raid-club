@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { TopNav, type Page } from "@/components/top-nav"
 import { FloatingBetSlip } from "@/components/floating-bet-slip"
 import { BetSlipModal } from "@/components/bet-slip-modal"
@@ -50,7 +50,9 @@ function MockPhantasmaApp() {
   return (
     <main className="min-h-screen bg-white">
       {/* Top Navigation */}
-      <TopNav currentPage={currentPage} onPageChange={setCurrentPage} />
+      <Suspense fallback={<div className="h-16 bg-gray-100" />}>
+        <TopNav currentPage={currentPage} onPageChange={setCurrentPage} />
+      </Suspense>
 
       {/* Main Content */}
       <div className="pt-20">
@@ -108,4 +110,5 @@ function MainnetPhantasmaApp() {
     </main>
   )
 }
+
 
