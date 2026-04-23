@@ -12,17 +12,17 @@ import {
 import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js"
 import { createConfig, http, WagmiProvider } from "wagmi"
 import { mainnet } from "wagmi/chains"
-import { customInterwovenChain, isMainnetRuntimeConfigured, raidClubViemChain } from "@/lib/initia/config"
+import { customPhantasmaChain, isMainnetRuntimeConfigured, phantasmaViemChain } from "@/lib/initia/config"
 
 const queryClient = new QueryClient()
 
 const wagmiConfig = createConfig({
   connectors: [initiaPrivyWalletConnector],
-  chains: raidClubViemChain ? [mainnet, raidClubViemChain] : [mainnet],
-  transports: raidClubViemChain
+  chains: phantasmaViemChain ? [mainnet, phantasmaViemChain] : [mainnet],
+  transports: phantasmaViemChain
     ? {
         [mainnet.id]: http(),
-        [raidClubViemChain.id]: http(raidClubViemChain.rpcUrls.default.http[0]),
+        [phantasmaViemChain.id]: http(phantasmaViemChain.rpcUrls.default.http[0]),
       }
     : { [mainnet.id]: http() },
 })
@@ -32,7 +32,7 @@ export default function Providers({ children }: PropsWithChildren) {
     injectStyles(InterwovenKitStyles)
   }, [])
 
-  if (!isMainnetRuntimeConfigured || !customInterwovenChain) {
+  if (!isMainnetRuntimeConfigured || !customPhantasmaChain) {
     return <>{children}</>
   }
 
@@ -41,12 +41,12 @@ export default function Providers({ children }: PropsWithChildren) {
       <WagmiProvider config={wagmiConfig}>
         <InterwovenKitProvider
           {...MAINNET}
-          defaultChainId={customInterwovenChain.chain_id}
-          customChain={customInterwovenChain}
-          enableAutoSign={{ [customInterwovenChain.chain_id]: ["/minievm.evm.v1.MsgCall"] }}
+          defaultChainId={customPhantasmaChain.chain_id}
+          customChain={customPhantasmaChain}
+          enableAutoSign={{ [customPhantasmaChain.chain_id]: ["/minievm.evm.v1.MsgCall"] }}
           autoSignFeePolicy={{
-            [customInterwovenChain.chain_id]: {
-              allowedFeeDenoms: customInterwovenChain.fees.fee_tokens.map((token) => token.denom),
+            [customPhantasmaChain.chain_id]: {
+              allowedFeeDenoms: customPhantasmaChain.fees.fee_tokens.map((token) => token.denom),
             },
           }}
           theme="dark"

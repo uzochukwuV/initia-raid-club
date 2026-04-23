@@ -1,6 +1,5 @@
 import { Panel } from "@/components/panel"
 import { ProgressBar } from "@/components/progress-bar"
-import { getRaidDefinition } from "@/lib/game/engine"
 import type { ActionType, PlayerProfile, RaidSession } from "@/lib/game/types"
 
 const actionDeck: Array<{ id: ActionType; label: string; description: string }> = [
@@ -26,7 +25,8 @@ export function RaidPanel({ session, player, onAction, onReturn }: RaidPanelProp
     )
   }
 
-  const raid = getRaidDefinition(session.raidId)
+  // Legacy raid panel - no longer used by Phantasma
+  return null
 
   if (!raid) {
     return null

@@ -3,9 +3,9 @@ import "./globals.css"
 import Providers from "./providers"
 
 export const metadata: Metadata = {
-  title: "Initia Raid Club",
+  title: "Phantasma Sportsbook",
   description:
-    "Async raid game MVP for the Initia hackathon, built around auto-signing, usernames, and demo-first product UX.",
+    "An onchain sportsbook and prediction market built as a Move appchain on Initia. Place 1X2 bets and provide liquidity to the House Pool.",
 }
 
 export default function RootLayout({

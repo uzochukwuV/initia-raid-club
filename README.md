@@ -1,24 +1,33 @@
-# Initia Raid Club
+# Phantasma Sportsbook
 
-Initia Raid Club is a fast, async onchain raid game for `INITIATE: The Initia Hackathon`.
+Phantasma is an onchain sportsbook and prediction market built as a Move appchain on Initia. Users place 1X2 bets (Home/Draw/Away) against a shared House Pool, and LPs can provide liquidity to become the counterparty to every bet.
 
-Initia Raid Club is the clearest demo of Initia-native gaming UX: identity, bridge, auto-signing, and fast onchain action in one loop.
+## Project Overview
 
-## Initia Hackathon Submission
+Phantasma is built as a dedicated Initia Move appchain featuring:
+- 1X2 sports betting markets with dynamic odds
+- Multi-leg parlay support for higher payouts
+- ERC4626-style LP share system with withdrawal queues
+- ED25519 signature verification for secure bet settlement
+- Auto-signing for fast bet placement and LP operations
+- Real-time exposure tracking to prevent house insolvency
 
-### Project Overview
+## Implementation Detail
 
-Initia Raid Club is a short-session onchain raid game built as a dedicated Initia MiniEVM rollup. The judge path is one loop: claim a handle, bridge in funds, mint a ticket, enter the featured boss fight, play several fast turns, and settle loot plus leaderboard progress.
+- Move smart contract for bet placement, settlement, and LP management (quadratic_market::sportsbook)
+- Type-safe frontend with Zustand state management and mock/mainnet toggle
+- Uses `@initia/interwovenkit-react` for wallet and auto-signing
+- Built to showcase onchain betting UX: wallet connection, rapid bet placement, and LP management in one flow
 
-### Implementation Detail
+## Key Features
 
-- Custom MiniEVM contract for player state, tickets, raid sessions, action resolution, rewards, and leaderboard data.
-- Custom game loop and frontend rather than a direct blueprint clone.
-- Uses `@initia/interwovenkit-react` for wallet and transaction flow.
-- Uses `auto-signing` for repeated combat turns and the Interwoven bridge modal for onboarding.
-- Built to show one thing clearly: identity, bridge, auto-signing, and combat inside one continuous product flow.
+- **Dashboard**: View live markets, balance, win rate, and LP position
+- **Bet Placement**: Build single or multi-leg parlays with automatic odds calculations
+- **Liquidity Management**: Provide liquidity, track LP value, and request withdrawals
+- **Leaderboard**: Compete on total volume, win rate, profit/loss, and LP returns
+- **Activity Log**: Real-time feed of all betting and LP operations
 
-### How to Run Locally
+## How to Run Locally
 
 1. Install dependencies:
    ```bash
@@ -29,25 +38,24 @@ Initia Raid Club is a short-session onchain raid game built as a dedicated Initi
    npm run dev
    ```
 3. Open `http://localhost:3000`.
-4. For the default demo path, use mock mode. For live rollup mode, fill the required `NEXT_PUBLIC_*` values from [`.env.example`](.env.example).
+4. For the default demo path, use mock mode. For live appchain mode, fill the required `NEXT_PUBLIC_*` values from [`.env.example`](.env.example).
 
-### Deployment Evidence
+## Configuration
 
-- Repository: [github.com/Zhekinmaksim/initia-raid-club](https://github.com/Zhekinmaksim/initia-raid-club)
-- Commit submitted: `eede5535521669b18dbdcd0cdf9bf879f5925111`
-- Public frontend: [initiaraid.club](https://initiaraid.club)
-- Demo video: [youtu.be/YjWZw0I-DOU](https://youtu.be/YjWZw0I-DOU)
-- Rollup chain ID: `raidclub-1`
-- VM: `MiniEVM`
-- Deployed contract: `0x994f46Ca8e811bd0454aD5Cf173eA77b0b270a3c`
-- Onchain core logic: [`contracts/raidclub-evm/src/RaidClub.sol`](contracts/raidclub-evm/src/RaidClub.sol)
-- Native feature frontend path: [`lib/initia/use-raid-club-mainnet.ts`](lib/initia/use-raid-club-mainnet.ts)
+### Environment Variables
+
+See [`.env.example`](.env.example) for all required configuration. Key variables:
+
+- `NEXT_PUBLIC_ROLLUP_CHAIN_ID`: Phantasma appchain ID
+- `NEXT_PUBLIC_PHANTASMA_CONTRACT`: Deployed sportsbook contract address
+- `NEXT_PUBLIC_ROLLUP_RPC_URL`, `NEXT_PUBLIC_ROLLUP_REST_URL`, etc.: Chain endpoints
 
 ### Smart Contract
 
-- Main contract: [`contracts/raidclub-evm/src/RaidClub.sol`](contracts/raidclub-evm/src/RaidClub.sol)
-- Test suite: [`contracts/raidclub-evm/test/RaidClub.t.sol`](contracts/raidclub-evm/test/RaidClub.t.sol)
-- Deploy script: [`contracts/raidclub-evm/script/deploy_mainnet.sh`](contracts/raidclub-evm/script/deploy_mainnet.sh)
+- Source: Phantasma sportsbook Move module (quadratic_market::sportsbook)
+- Reference: [github.com/Naabiae/Betbing3](https://github.com/Naabiae/Betbing3)
+- Module path: `quadratic_market::sportsbook`
+- Key types: `BetSlip`, `Market`, `Selection`, `HousePool`, `LPState`
 - Contract scope: player registration, ticket purchase, raid session start, action execution, settlement, and progression updates.
 
 The submitted demo is built around one loop:
