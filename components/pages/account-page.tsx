@@ -20,8 +20,8 @@ export function AccountPage({
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#f3eee4] mb-2">Account</h1>
-        <p className="text-[#8f877c]">
+        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-2">Account</h1>
+        <p className="text-gray-600">
           {user.address
             ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}`
             : "Not connected"}
@@ -29,46 +29,46 @@ export function AccountPage({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="rounded-lg border border-white/10 bg-white/2 p-6">
-          <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+          <p className="text-xs text-gray-600 uppercase tracking-wider">
             Balance
           </p>
-          <p className="text-3xl font-bold text-[#d7b37b] mt-2">
+          <p className="text-3xl font-bold text-blue-600 mt-2">
             {user.balanceUSDC}
           </p>
-          <p className="text-xs text-[#6b6460] mt-1">USDC</p>
+          <p className="text-xs text-gray-500 mt-1">USDC</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/2 p-6">
-          <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+          <p className="text-xs text-gray-600 uppercase tracking-wider">
             Win Rate
           </p>
-          <p className="text-3xl font-bold text-[#d7b37b] mt-2">
+          <p className="text-3xl font-bold text-blue-600 mt-2">
             {winRatePercent}%
           </p>
-          <p className="text-xs text-[#6b6460] mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {user.totalBetsPlaced} bets
           </p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/2 p-6">
-          <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+          <p className="text-xs text-gray-600 uppercase tracking-wider">
             LP Position
           </p>
-          <p className="text-3xl font-bold text-[#d7b37b] mt-2">
+          <p className="text-3xl font-bold text-blue-600 mt-2">
             {user.lpShares}
           </p>
-          <p className="text-xs text-[#6b6460] mt-1">shares</p>
+          <p className="text-xs text-gray-500 mt-1">shares</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/2 p-6">
-          <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+          <p className="text-xs text-gray-600 uppercase tracking-wider">
             LP Value
           </p>
-          <p className="text-3xl font-bold text-[#d7b37b] mt-2">
+          <p className="text-3xl font-bold text-blue-600 mt-2">
             ${user.lpValue}
           </p>
-          <p className="text-xs text-[#6b6460] mt-1">total returns</p>
+          <p className="text-xs text-gray-500 mt-1">total returns</p>
         </div>
       </div>
 
@@ -76,21 +76,21 @@ export function AccountPage({
         <button
           onClick={onConnectWallet}
           disabled={!!user.address}
-          className="w-full rounded-lg bg-[#d7b37b] text-[#0f0d0a] py-3 font-semibold hover:bg-[#e8c49c] transition disabled:bg-white/10 disabled:text-[#6b6460] disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           {user.address ? "Wallet Connected" : "Connect Wallet"}
         </button>
         <button
           onClick={onDepositBalance}
           disabled={!user.address}
-          className="w-full rounded-lg bg-white/8 text-[#d7b37b] py-3 font-semibold hover:bg-white/12 transition disabled:text-[#6b6460] disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-gray-100 text-blue-600 py-3 font-semibold hover:bg-gray-200 transition disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           Deposit 100 USDC
         </button>
         <button
           onClick={onAddLiquidity}
           disabled={!user.address}
-          className="w-full rounded-lg bg-white/8 text-[#d7b37b] py-3 font-semibold hover:bg-white/12 transition disabled:text-[#6b6460] disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-gray-100 text-blue-600 py-3 font-semibold hover:bg-gray-200 transition disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           Add Liquidity
         </button>

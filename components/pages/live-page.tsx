@@ -14,11 +14,11 @@ export function LivePage({ onOddsClick }: LivePageProps) {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#f3eee4] mb-2 flex items-center gap-2">
+        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-2 flex items-center gap-2">
           <span className="inline-block h-3 w-3 rounded-full bg-red-500 animate-pulse" />
           Live Matches
         </h1>
-        <p className="text-[#8f877c]">{liveMatches.length} matches in progress</p>
+        <p className="text-gray-600">{liveMatches.length} matches in progress</p>
       </div>
 
       <div className="space-y-3">

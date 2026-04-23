@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
 
 export function BottomNav({ currentPage, onPageChange }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#1a1a1a]/95 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-around px-4 py-3 sm:px-6">
         {navItems.map((item) => (
           <button
@@ -32,8 +32,8 @@ export function BottomNav({ currentPage, onPageChange }: BottomNavProps) {
             onClick={() => onPageChange(item.id as Page)}
             className={`flex flex-col items-center gap-1 py-2 px-3 transition ${
               currentPage === item.id
-                ? "text-[#d7b37b]"
-                : "text-[#8f877c] hover:text-[#b5ada0]"
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             <span className="text-xl">{item.icon}</span>

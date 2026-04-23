@@ -33,14 +33,14 @@ export function MatchGroups({ groups, onOddsClick }: MatchGroupProps) {
           {/* League Header */}
           <button
             onClick={() => toggleLeague(group.league)}
-            className="flex items-center justify-between w-full px-4 py-3 rounded-lg border border-white/10 bg-white/3 hover:bg-white/5 transition"
+            className="flex items-center justify-between w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition"
           >
             <div className="flex items-center gap-3">
               <span className="text-lg">⚽</span>
-              <h3 className="font-semibold text-[#f3eee4]">{group.league}</h3>
-              <span className="text-xs text-[#8f877c]">({group.matches.length})</span>
+              <h3 className="font-semibold text-[#1a1a1a]">{group.league}</h3>
+              <span className="text-xs text-gray-600">({group.matches.length})</span>
             </div>
-            <span className="text-[#d7b37b]">
+            <span className="text-blue-600">
               {expandedLeagues[group.league] ? "−" : "+"}
             </span>
           </button>

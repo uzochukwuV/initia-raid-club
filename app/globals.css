@@ -5,16 +5,16 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
-  --bg: #111111;
-  --bg-soft: #171717;
-  --panel: #151515;
-  --panel-soft: #1a1a1a;
-  --ink: #f3eee4;
-  --muted: #b5ada0;
-  --line: rgba(243, 238, 228, 0.12);
-  --line-strong: rgba(243, 238, 228, 0.2);
-  --accent: #d7b37b;
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-soft: #f8f8f8;
+  --panel: #f5f5f5;
+  --panel-soft: #eeeeee;
+  --ink: #1a1a1a;
+  --muted: #666666;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.12);
+  --accent: #0066ff;
 }
 
 * {
@@ -28,9 +28,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: #0f0d0a;
+  background: #ffffff;
   color: var(--ink);
-  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -49,7 +49,7 @@ select {
 }
 
 .section-code {
-  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }

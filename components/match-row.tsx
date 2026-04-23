@@ -32,13 +32,13 @@ export function MatchRow({ match, onOddsClick }: MatchRowProps) {
       onMouseLeave={() => setIsHovered(false)}
       className={`flex items-center gap-3 sm:gap-4 rounded-lg border transition-all duration-200 px-3 sm:px-4 py-3 ${
         isHovered
-          ? "border-white/20 bg-white/8"
-          : "border-white/10 bg-white/2"
+          ? "border-gray-300 bg-gray-50"
+          : "border-gray-200 bg-white"
       }`}
     >
       {/* Time / Status */}
       <div className="w-14 sm:w-16 flex-shrink-0 text-center">
-        <p className={`text-xs font-medium ${isLive ? "text-red-400" : "text-[#8f877c]"}`}>
+        <p className={`text-xs font-medium ${isLive ? "text-red-500" : "text-gray-600"}`}>
           {isLive ? "LIVE" : formatTime(match.start_time)}
         </p>
         {isLive && (
@@ -50,13 +50,13 @@ export function MatchRow({ match, onOddsClick }: MatchRowProps) {
 
       {/* Teams */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[#f3eee4] truncate">
+        <p className="text-sm font-semibold text-[#1a1a1a] truncate">
           {match.homeTeam}
         </p>
-        <p className="text-xs text-[#8f877c] truncate">
+        <p className="text-xs text-gray-600 truncate">
           vs {match.awayTeam}
         </p>
-        <p className="text-xs text-[#6b6460] mt-0.5 hidden sm:block">
+        <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">
           {match.sport}
         </p>
       </div>
@@ -65,14 +65,14 @@ export function MatchRow({ match, onOddsClick }: MatchRowProps) {
       <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
         <button
           onClick={() => onOddsClick(match.match_id, 0)}
-          className="min-w-12 sm:min-w-14 rounded bg-white/8 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#f3eee4] hover:bg-white/12 hover:text-[#d7b37b] transition"
+          className="min-w-12 sm:min-w-14 rounded bg-gray-100 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:bg-blue-100 hover:text-blue-600 transition"
           title="Home Win"
         >
           {oddsDisplay[0]}
         </button>
         <button
           onClick={() => onOddsClick(match.match_id, 1)}
-          className="min-w-12 sm:min-w-14 rounded bg-white/8 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#f3eee4] hover:bg-white/12 hover:text-[#d7b37b] transition flex flex-col items-center justify-center"
+          className="min-w-12 sm:min-w-14 rounded bg-gray-100 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:bg-blue-100 hover:text-blue-600 transition flex flex-col items-center justify-center"
           title="Draw"
         >
           <span className="text-[10px]">X</span>
@@ -80,7 +80,7 @@ export function MatchRow({ match, onOddsClick }: MatchRowProps) {
         </button>
         <button
           onClick={() => onOddsClick(match.match_id, 2)}
-          className="min-w-12 sm:min-w-14 rounded bg-white/8 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#f3eee4] hover:bg-white/12 hover:text-[#d7b37b] transition"
+          className="min-w-12 sm:min-w-14 rounded bg-gray-100 py-2 px-2 sm:px-3 text-xs sm:text-sm font-semibold text-[#1a1a1a] hover:bg-blue-100 hover:text-blue-600 transition"
           title="Away Win"
         >
           {oddsDisplay[2]}

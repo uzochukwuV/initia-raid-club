@@ -26,8 +26,8 @@ export function MarketsPage({ onOddsClick }: MarketsPageProps) {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#f3eee4] mb-2">All Markets</h1>
-        <p className="text-[#8f877c]">{mockSportEvents.length} upcoming matches</p>
+        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-2">All Markets</h1>
+        <p className="text-gray-600">{mockSportEvents.length} upcoming matches</p>
       </div>
 
       <MatchGroups groups={grouped} onOddsClick={onOddsClick} />
