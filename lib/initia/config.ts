@@ -11,7 +11,7 @@ const requiredEnvKeys = [
   "NEXT_PUBLIC_ROLLUP_INDEXER_URL",
   "NEXT_PUBLIC_ROLLUP_NATIVE_DENOM",
   "NEXT_PUBLIC_ROLLUP_NATIVE_SYMBOL",
-  "NEXT_PUBLIC_RAIDCLUB_CONTRACT",
+  "NEXT_PUBLIC_PHANTASMA_CONTRACT",
 ] as const
 
 function readEnv(key: (typeof requiredEnvKeys)[number]) {
@@ -21,7 +21,7 @@ function readEnv(key: (typeof requiredEnvKeys)[number]) {
 const evmChainId = Number(process.env.NEXT_PUBLIC_ROLLUP_EVM_CHAIN_ID ?? "0")
 const nativeDecimals = Number(process.env.NEXT_PUBLIC_ROLLUP_NATIVE_DECIMALS ?? "18")
 
-export const raidClubEnv = {
+export const phantasmaEnv = {
   chainId: readEnv("NEXT_PUBLIC_ROLLUP_CHAIN_ID"),
   chainName: readEnv("NEXT_PUBLIC_ROLLUP_CHAIN_NAME"),
   prettyName: readEnv("NEXT_PUBLIC_ROLLUP_PRETTY_NAME"),
@@ -33,7 +33,7 @@ export const raidClubEnv = {
   nativeDenom: readEnv("NEXT_PUBLIC_ROLLUP_NATIVE_DENOM"),
   nativeSymbol: readEnv("NEXT_PUBLIC_ROLLUP_NATIVE_SYMBOL"),
   nativeDecimals,
-  contractAddress: readEnv("NEXT_PUBLIC_RAIDCLUB_CONTRACT"),
+  contractAddress: readEnv("NEXT_PUBLIC_PHANTASMA_CONTRACT"),
   bridgeSrcChainId: process.env.NEXT_PUBLIC_BRIDGE_SRC_CHAIN_ID?.trim() || "interwoven-1",
   bridgeSrcDenom: process.env.NEXT_PUBLIC_BRIDGE_SRC_DENOM?.trim() || "uinit",
   blockExplorerUrl: process.env.NEXT_PUBLIC_ROLLUP_EXPLORER_URL?.trim() || "",
@@ -46,11 +46,11 @@ export const mainnetRuntimeIssues = requiredEnvKeys
 
 export const isMainnetRuntimeConfigured = mainnetRuntimeIssues.length === 0
 
-export const customInterwovenChain = isMainnetRuntimeConfigured
+export const customPhantasmaChain = isMainnetRuntimeConfigured
   ? {
-      chain_id: raidClubEnv.chainId,
-      chain_name: raidClubEnv.chainName,
-      pretty_name: raidClubEnv.prettyName,
+      chain_id: phantasmaEnv.chainId,
+      chain_name: phantasmaEnv.chainName,
+      pretty_name: phantasmaEnv.prettyName,
       network_type: "mainnet" as const,
       bech32_prefix: "init",
       logo_URIs: {
@@ -58,15 +58,15 @@ export const customInterwovenChain = isMainnetRuntimeConfigured
         svg: "https://raw.githubusercontent.com/initia-labs/initia-registry/main/mainnets/initia/images/initia.svg",
       },
       apis: {
-        rpc: [{ address: raidClubEnv.rpcUrl }],
-        rest: [{ address: raidClubEnv.restUrl }],
-        indexer: [{ address: raidClubEnv.indexerUrl }],
-        "json-rpc": [{ address: raidClubEnv.jsonRpcUrl }],
+        rpc: [{ address: phantasmaEnv.rpcUrl }],
+        rest: [{ address: phantasmaEnv.restUrl }],
+        indexer: [{ address: phantasmaEnv.indexerUrl }],
+        "json-rpc": [{ address: phantasmaEnv.jsonRpcUrl }],
       },
       fees: {
         fee_tokens: [
           {
-            denom: raidClubEnv.nativeDenom,
+            denom: phantasmaEnv.nativeDenom,
             fixed_min_gas_price: 0,
             low_gas_price: 0,
             average_gas_price: 0,
@@ -75,7 +75,7 @@ export const customInterwovenChain = isMainnetRuntimeConfigured
         ],
       },
       staking: {
-        staking_tokens: [{ denom: raidClubEnv.nativeDenom }],
+        staking_tokens: [{ denom: phantasmaEnv.nativeDenom }],
       },
       metadata: {
         minitia: { type: "minievm" },
@@ -83,34 +83,39 @@ export const customInterwovenChain = isMainnetRuntimeConfigured
       },
       native_assets: [
         {
-          denom: raidClubEnv.nativeDenom,
-          name: raidClubEnv.nativeSymbol,
-          symbol: raidClubEnv.nativeSymbol,
-          decimals: raidClubEnv.nativeDecimals,
+          denom: phantasmaEnv.nativeDenom,
+          name: phantasmaEnv.nativeSymbol,
+          symbol: phantasmaEnv.nativeSymbol,
+          decimals: phantasmaEnv.nativeDecimals,
         },
       ],
     }
   : null
 
-export const raidClubViemChain = isMainnetRuntimeConfigured
+export const phantasmaViemChain = isMainnetRuntimeConfigured
   ? defineChain({
-      id: raidClubEnv.evmChainId,
-      name: raidClubEnv.prettyName,
+      id: phantasmaEnv.evmChainId,
+      name: phantasmaEnv.prettyName,
       nativeCurrency: {
-        name: raidClubEnv.nativeSymbol,
-        symbol: raidClubEnv.nativeSymbol,
-        decimals: raidClubEnv.nativeDecimals,
+        name: phantasmaEnv.nativeSymbol,
+        symbol: phantasmaEnv.nativeSymbol,
+        decimals: phantasmaEnv.nativeDecimals,
       },
       rpcUrls: {
-        default: { http: [raidClubEnv.jsonRpcUrl] },
+        default: { http: [phantasmaEnv.jsonRpcUrl] },
       },
-      blockExplorers: raidClubEnv.blockExplorerUrl
+      blockExplorers: phantasmaEnv.blockExplorerUrl
         ? {
             default: {
-              name: `${raidClubEnv.prettyName} Explorer`,
-              url: raidClubEnv.blockExplorerUrl,
+              name: `${phantasmaEnv.prettyName} Explorer`,
+              url: phantasmaEnv.blockExplorerUrl,
             },
           }
         : undefined,
     })
   : null
+
+// Legacy Raid Club config (kept for reference)
+export const raidClubEnv = phantasmaEnv
+export const customInterwovenChain = customPhantasmaChain
+export const raidClubViemChain = phantasmaViemChain

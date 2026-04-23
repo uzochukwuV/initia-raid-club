@@ -1,126 +1,122 @@
 "use client"
 
 import { create } from "zustand"
-import { rivalLeaderboard, starterActivity, starterInventory } from "./data"
-import { applyProgression, createRaidSession, getRaidDefinition, resolveRaidTurn } from "./engine"
+import { mockSportEvents, mockHousePool, starterActivity, rivalLeaderboard } from "./data"
 import type {
-  ActionType,
   ActivityEntry,
+  BetSlip,
+  BettingSession,
   LeaderboardEntry,
-  LootItem,
   NativeFeatureStatus,
-  PlayerProfile,
-  RaidSession,
+  Selection,
+  SportEvent,
+  UserProfile,
   Screen,
 } from "./types"
 
 type GameState = {
   screen: Screen
-  player: PlayerProfile
-  inventory: LootItem[]
-  raidSession: RaidSession | null
+  user: UserProfile
+  sportEvents: SportEvent[]
+  housePool: typeof mockHousePool
+  bettingSession: BettingSession | null
+  activeBets: BetSlip[]
+  betHistory: BetSlip[]
   activity: ActivityEntry[]
   nativeFeatures: NativeFeatureStatus
   setScreen: (screen: Screen) => void
-  bindUsername: (username: string) => void
-  mockBridgeIn: (amount?: number) => void
-  mintRaidTicket: () => void
-  startRaid: (raidId: string) => void
-  performRaidAction: (action: ActionType) => void
-  returnToBase: () => void
-  equipItem: (itemId: string) => void
+  connectWallet: (address: string) => void
+  depositBalance: (amount: number) => void
+  addSelectionToBet: (selection: Selection) => void
+  removeSelectionFromBet: (index: number) => void
+  updateStake: (amount: number) => void
+  placeBet: () => Promise<void>
+  addLiquidity: (amount: number) => Promise<void>
+  requestWithdraw: (shares: number) => Promise<void>
+  settleBet: (slipId: string, won: boolean) => void
   resetDemo: () => void
 }
 
-const initialPlayer = (): PlayerProfile => ({
-  username: null,
-  level: 3,
-  xp: 40,
-  xpToNext: 120,
-  hp: 96,
-  maxHp: 100,
-  energy: 74,
-  maxEnergy: 100,
-  tickets: 2,
-  coins: 128,
-  bridgeBalance: 40,
-  winStreak: 2,
-  totalLootValue: 54,
-  faction: "Obsidian Wake",
-  gear: {
-    weapon: "rookie-axe",
-    charm: "signal-band",
-  },
+const initialUser = (): UserProfile => ({
+  address: null,
+  balanceUSDC: 1000,
+  lpShares: 0,
+  totalBetsPlaced: 0,
+  totalWon: 0,
+  totalLost: 0,
+  winRate: 0,
+  lpValue: 0,
+  lpWithdrawalRequest: null,
 })
 
-const demoPresetPlayer = (): PlayerProfile => ({
-  ...initialPlayer(),
-  username: "nightglass.raider",
-  hp: 100,
-  energy: 100,
-  tickets: 3,
-  bridgeBalance: 30,
+const demoPresetUser = (): UserProfile => ({
+  ...initialUser(),
+  address: "0x1a2b3c4d5e6f7g8h9i0j",
+  balanceUSDC: 5000,
+  lpShares: 100,
+  totalBetsPlaced: 45,
+  totalWon: 28,
+  totalLost: 17,
+  winRate: 0.62,
+  lpValue: 505000,
 })
 
 const demoPresetActivity = (): ActivityEntry[] => [
   {
     id: crypto.randomUUID(),
-    title: "Demo preset ready",
-    detail: "Nightglass Warden route is primed for a clean recording pass.",
+    title: "Wallet connected",
+    detail: "Demo wallet loaded with 5000 USDC and 100 LP shares.",
     timestamp: "Now",
     tone: "success",
   },
   {
     id: crypto.randomUUID(),
-    title: "Username claimed",
-    detail: "nightglass.raider is bound and ready for the featured boss run.",
+    title: "Markets live",
+    detail: "5 sports betting markets available for placing bets.",
     timestamp: "Now",
     tone: "success",
   },
   ...starterActivity,
 ]
 
-export const buildMockLeaderboard = (player: PlayerProfile): LeaderboardEntry[] =>
+export const buildMockLeaderboard = (user: UserProfile): LeaderboardEntry[] =>
   [
     {
       id: "player",
-      username: player.username ?? "unclaimed.raider",
-      score: player.level * 220 + player.winStreak * 30 + player.totalLootValue,
-      streak: player.winStreak,
-      totalLoot: player.totalLootValue,
-      faction: player.faction,
+      address: user.address ?? "0x0000000000000000",
+      totalVolume: user.totalBetsPlaced * 150,
+      winRate: user.winRate,
+      profitLoss: (user.totalWon - user.totalLost) * 50,
+      lpReturns: user.lpValue - 50000,
       highlight: true,
     },
     ...rivalLeaderboard,
-  ].sort((left, right) => right.score - left.score)
+  ].sort((left, right) => right.totalVolume - left.totalVolume)
 
-export const useRaidClubStore = create<GameState>((set, get) => ({
-  screen: "base",
-  player: initialPlayer(),
-  inventory: starterInventory,
-  raidSession: null,
+export const usePhantasmaStore = create<GameState>((set, get) => ({
+  screen: "dashboard",
+  user: initialUser(),
+  sportEvents: mockSportEvents,
+  housePool: mockHousePool,
+  bettingSession: null,
+  activeBets: [],
+  betHistory: [],
   activity: starterActivity,
   nativeFeatures: {
     autoSigningArmed: true,
-    usernamesBound: false,
+    walletConnected: false,
     bridgeConnected: true,
   },
   setScreen: (screen) => set({ screen }),
-  bindUsername: (username) => {
-    const value = username.trim()
-
-    if (!value) {
-      return
-    }
-
+  connectWallet: (address) => {
     set((state) => ({
-      player: { ...state.player, username: value },
-      nativeFeatures: { ...state.nativeFeatures, usernamesBound: true },
+      user: { ...state.user, address },
+      nativeFeatures: { ...state.nativeFeatures, walletConnected: true },
       activity: [
         {
           id: crypto.randomUUID(),
-          title: "Username claimed",
-          detail: `${value} is now broadcasting across the raid board.`,
+          title: "Wallet connected",
+          detail: `Connected to ${address.slice(0, 6)}...${address.slice(-4)}.`,
           timestamp: "Now",
           tone: "success",
         },
@@ -128,110 +124,248 @@ export const useRaidClubStore = create<GameState>((set, get) => ({
       ],
     }))
   },
-  mockBridgeIn: (amount = 25) =>
+  depositBalance: (amount) =>
     set((state) => ({
-      player: {
-        ...state.player,
-        bridgeBalance: state.player.bridgeBalance + amount,
+      user: {
+        ...state.user,
+        balanceUSDC: state.user.balanceUSDC + amount,
       },
       activity: [
         {
           id: crypto.randomUUID(),
-          title: "Bridge settled",
-          detail: `${amount} INIT routed into the raid chain without leaving the app.`,
+          title: "Balance topped up",
+          detail: `${amount} USDC deposited to wallet.`,
           timestamp: "Now",
           tone: "success",
         },
         ...state.activity,
       ],
     })),
-  mintRaidTicket: () =>
+  addSelectionToBet: (selection) =>
     set((state) => {
-      if (state.player.bridgeBalance < 10) {
+      if (!state.bettingSession) {
         return {
-          activity: [
-            {
-              id: crypto.randomUUID(),
-              title: "Ticket mint blocked",
-              detail: "Top up through the bridge before minting another ticket.",
-              timestamp: "Now",
-              tone: "warning",
+          bettingSession: {
+            bettor: state.user.address || "unknown",
+            selections: [selection],
+            stake: 0,
+            potential_payout: 0,
+            status: "building",
+            transcript: [],
+            autoSigning: {
+              enabled: true,
+              pending: false,
+              lastAction: null,
+              message: "",
             },
-            ...state.activity,
-          ],
+          },
         }
       }
 
+      // Check for duplicate selection
+      const hasDuplicate = state.bettingSession.selections.some(
+        (s) => s.match_id === selection.match_id && s.market_id === selection.market_id
+      )
+
+      if (hasDuplicate) {
+        return state
+      }
+
       return {
-        player: {
-          ...state.player,
-          tickets: state.player.tickets + 1,
-          bridgeBalance: state.player.bridgeBalance - 10,
+        bettingSession: {
+          ...state.bettingSession,
+          selections: [...state.bettingSession.selections, selection],
         },
+      }
+    }),
+  removeSelectionFromBet: (index) =>
+    set((state) => {
+      if (!state.bettingSession) return state
+
+      const newSelections = state.bettingSession.selections.filter((_, i) => i !== index)
+
+      if (newSelections.length === 0) {
+        return { bettingSession: null }
+      }
+
+      return {
+        bettingSession: {
+          ...state.bettingSession,
+          selections: newSelections,
+        },
+      }
+    }),
+  updateStake: (amount) =>
+    set((state) => {
+      if (!state.bettingSession) return state
+
+      // Calculate potential payout (parlay odds)
+      let potentialPayout = amount
+      const oddsBasis = 10000
+
+      for (const selection of state.bettingSession.selections) {
+        potentialPayout = (potentialPayout * selection.odds) / oddsBasis
+      }
+
+      return {
+        bettingSession: {
+          ...state.bettingSession,
+          stake: amount,
+          potential_payout: Math.floor(potentialPayout),
+        },
+      }
+    }),
+  placeBet: async () => {
+    const current = get()
+
+    if (!current.bettingSession || current.bettingSession.selections.length === 0) {
+      return
+    }
+
+    if (current.user.balanceUSDC < current.bettingSession.stake) {
+      set((state) => ({
         activity: [
           {
             id: crypto.randomUUID(),
-            title: "Raid ticket minted",
-            detail: "10 INIT converted into one fresh raid pass.",
+            title: "Insufficient balance",
+            detail: `Need ${current.bettingSession!.stake} USDC to place this bet.`,
+            timestamp: "Now",
+            tone: "warning",
+          },
+          ...state.activity,
+        ],
+      }))
+      return
+    }
+
+    // Simulate auto-signing
+    set((state) => ({
+      bettingSession: state.bettingSession
+        ? {
+            ...state.bettingSession,
+            autoSigning: {
+              ...state.bettingSession.autoSigning,
+              pending: true,
+              lastAction: "place_bet",
+              message: "Auto-signing bet and broadcasting to Phantasma...",
+            },
+          }
+        : null,
+    }))
+
+    // Simulate transaction delay
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    set((state) => {
+      if (!state.bettingSession) return state
+
+      const newBet: BetSlip = {
+        slip_id: crypto.randomUUID(),
+        bettor: state.user.address || "unknown",
+        selections: state.bettingSession.selections,
+        stake: state.bettingSession.stake,
+        potential_payout: state.bettingSession.potential_payout,
+        status: 0, // ACTIVE
+        placed_at: Math.floor(Date.now() / 1000),
+      }
+
+      return {
+        user: {
+          ...state.user,
+          balanceUSDC: state.user.balanceUSDC - state.bettingSession.stake,
+          totalBetsPlaced: state.user.totalBetsPlaced + 1,
+        },
+        activeBets: [newBet, ...state.activeBets],
+        bettingSession: null,
+        activity: [
+          {
+            id: crypto.randomUUID(),
+            title: "Bet placed",
+            detail: `${state.bettingSession.selections.length}-leg parlay for ${state.bettingSession.stake} USDC placed.`,
             timestamp: "Now",
             tone: "success",
           },
           ...state.activity,
         ],
       }
-    }),
-  startRaid: (raidId) =>
+    })
+  },
+  addLiquidity: async (amount) => {
+    set((state) => ({
+      nativeFeatures: {
+        ...state.nativeFeatures,
+        autoSigningArmed: true,
+      },
+      activity: [
+        {
+          id: crypto.randomUUID(),
+          title: "Auto-signing liquidity",
+          detail: `Depositing ${amount} USDC to the house pool...`,
+          timestamp: "Now",
+          tone: "neutral",
+        },
+        ...state.activity,
+      ],
+    }))
+
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
     set((state) => {
-      const raid = getRaidDefinition(raidId)
-
-      if (!raid) {
-        return state
-      }
-
-      if (!state.player.username) {
-        return {
-          screen: "base",
-          activity: [
-            {
-              id: crypto.randomUUID(),
-              title: "Username required",
-              detail: "Bind a username before entering the next raid.",
-              timestamp: "Now",
-              tone: "warning",
-            },
-            ...state.activity,
-          ],
-        }
-      }
-
-      if (state.player.energy < raid.energyCost || state.player.tickets < raid.ticketCost) {
-        return {
-          activity: [
-            {
-              id: crypto.randomUUID(),
-              title: "Raid locked",
-              detail: "Not enough energy or tickets for that run.",
-              timestamp: "Now",
-              tone: "warning",
-            },
-            ...state.activity,
-          ],
-        }
-      }
+      const sharesMinted = (amount / state.housePool.reserve_balance) * state.housePool.total_supply
+      const newLPValue = state.user.lpShares + (sharesMinted * state.housePool.reserve_balance) / state.housePool.total_supply
 
       return {
-        screen: "raid",
-        player: {
-          ...state.player,
-          energy: state.player.energy - raid.energyCost,
-          tickets: state.player.tickets - raid.ticketCost,
+        user: {
+          ...state.user,
+          balanceUSDC: state.user.balanceUSDC - amount,
+          lpShares: state.user.lpShares + sharesMinted,
+          lpValue: newLPValue,
         },
-        raidSession: createRaidSession(raid),
+        housePool: {
+          ...state.housePool,
+          reserve_balance: state.housePool.reserve_balance + amount,
+        },
         activity: [
           {
             id: crypto.randomUUID(),
-            title: "Raid deployed",
-            detail: `${raid.name} opened with auto-signing active.`,
+            title: "Liquidity added",
+            detail: `${amount} USDC deposited. You received ${Math.floor(sharesMinted)} LP shares.`,
+            timestamp: "Now",
+            tone: "success",
+          },
+          ...state.activity,
+        ],
+      }
+    })
+  },
+  requestWithdraw: async (shares) =>
+    set((state) => {
+      if (state.user.lpShares < shares) {
+        set((s) => ({
+          activity: [
+            {
+              id: crypto.randomUUID(),
+              title: "Insufficient LP shares",
+              detail: `You only have ${s.user.lpShares} LP shares.`,
+              timestamp: "Now",
+              tone: "warning",
+            },
+            ...s.activity,
+          ],
+        }))
+        return state
+      }
+
+      return {
+        user: {
+          ...state.user,
+          lpWithdrawalRequest: shares,
+        },
+        activity: [
+          {
+            id: crypto.randomUUID(),
+            title: "Withdrawal queued",
+            detail: `${shares} LP shares queued for withdrawal. Processing in next batch.`,
             timestamp: "Now",
             tone: "neutral",
           },
@@ -239,119 +373,39 @@ export const useRaidClubStore = create<GameState>((set, get) => ({
         ],
       }
     }),
-  performRaidAction: (action) => {
-    const current = get()
-
-    if (!current.raidSession || current.raidSession.status !== "active" || current.raidSession.autoSigning.pending) {
-      return
-    }
-
-    set((state) => ({
-      raidSession: state.raidSession
-        ? {
-            ...state.raidSession,
-            autoSigning: {
-              ...state.raidSession.autoSigning,
-              pending: true,
-              lastAction: action,
-              message: `Auto-signing ${action} and broadcasting to the raid chain...`,
-            },
-          }
-        : null,
-    }))
-
-    window.setTimeout(() => {
-      set((state) => {
-        if (!state.raidSession) {
-          return state
-        }
-
-        const raid = getRaidDefinition(state.raidSession.raidId)
-
-        if (!raid) {
-          return state
-        }
-
-        const resolution = resolveRaidTurn(raid, state.raidSession, state.player, state.inventory, action)
-        const session = resolution.nextSession
-
-        if (session.status === "active") {
-          return {
-            raidSession: session,
-            player: {
-              ...state.player,
-              hp: resolution.nextPlayerHp,
-            },
-          }
-        }
-
-        const nextHp = session.status === "won" ? Math.min(state.player.maxHp, resolution.nextPlayerHp + 10) : state.player.maxHp
-        const progression = applyProgression(state.player, session.rewardXp)
-        const rewardInventory = session.rewardItem ? [session.rewardItem, ...state.inventory] : state.inventory
-        const totalLootValue = state.player.totalLootValue + (session.rewardItem?.power ?? 0) * 6 + session.rewardCoins
-
-        return {
-          raidSession: session,
-          inventory: rewardInventory,
-          player: {
-            ...state.player,
-            hp: nextHp,
-            coins: state.player.coins + session.rewardCoins,
-            level: progression.level,
-            xp: progression.xp,
-            xpToNext: progression.xpToNext,
-            winStreak: session.status === "won" ? state.player.winStreak + 1 : 0,
-            totalLootValue,
-          },
-          activity: [
-            {
-              id: crypto.randomUUID(),
-              title: session.status === "won" ? "Raid cleared" : "Raid failed",
-              detail:
-                session.status === "won"
-                  ? `${raid.name} paid ${session.rewardCoins} coins${session.rewardItem ? ` and ${session.rewardItem.name}` : ""}.`
-                  : `${raid.name} reset after five actions. Re-arm and try again.`,
-              timestamp: "Now",
-              tone: session.status === "won" ? "success" : "warning",
-            },
-            ...state.activity,
-          ],
-        }
-      })
-    }, 700)
-  },
-  returnToBase: () =>
-    set((state) => ({
-      screen: "base",
-      raidSession: null,
-      player: {
-        ...state.player,
-        hp: state.player.maxHp,
-      },
-    })),
-  equipItem: (itemId) =>
+  settleBet: (slipId, won) =>
     set((state) => {
-      const item = state.inventory.find((entry) => entry.id === itemId)
+      const bet = state.activeBets.find((b) => b.slip_id === slipId)
 
-      if (!item) {
-        return state
+      if (!bet) return state
+
+      const updatedBet: BetSlip = {
+        ...bet,
+        status: won ? 1 : 2, // 1=WON, 2=LOST
+      }
+
+      const balanceGain = won ? updatedBet.potential_payout : 0
+      const nextUser = {
+        ...state.user,
+        balanceUSDC: state.user.balanceUSDC + balanceGain,
+        totalWon: state.user.totalWon + (won ? 1 : 0),
+        totalLost: state.user.totalLost + (won ? 0 : 1),
+        winRate: (state.user.totalWon + (won ? 1 : 0)) / (state.user.totalBetsPlaced),
       }
 
       return {
-        player: {
-          ...state.player,
-          gear: {
-            ...state.player.gear,
-            [item.slot]: item.id,
-          },
-        },
+        user: nextUser,
+        activeBets: state.activeBets.filter((b) => b.slip_id !== slipId),
+        betHistory: [...state.betHistory, updatedBet],
         activity: [
           {
             id: crypto.randomUUID(),
-            title: "Gear updated",
-            detail: `${item.name} equipped in ${item.slot} slot.`,
+            title: won ? "Bet won" : "Bet lost",
+            detail: won
+              ? `Parlay settled. You won ${updatedBet.potential_payout} USDC!`
+              : `Parlay settled. One or more legs lost.`,
             timestamp: "Now",
-            tone: "neutral",
+            tone: won ? "success" : "warning",
           },
           ...state.activity,
         ],
@@ -359,14 +413,17 @@ export const useRaidClubStore = create<GameState>((set, get) => ({
     }),
   resetDemo: () =>
     set({
-      screen: "base",
-      player: demoPresetPlayer(),
-      inventory: starterInventory,
-      raidSession: null,
+      screen: "dashboard",
+      user: demoPresetUser(),
+      sportEvents: mockSportEvents,
+      housePool: mockHousePool,
+      bettingSession: null,
+      activeBets: [],
+      betHistory: [],
       activity: demoPresetActivity(),
       nativeFeatures: {
         autoSigningArmed: true,
-        usernamesBound: true,
+        walletConnected: true,
         bridgeConnected: true,
       },
     }),

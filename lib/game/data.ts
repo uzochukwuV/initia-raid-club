@@ -1,157 +1,125 @@
-import type { ActivityEntry, LeaderboardEntry, LootItem, RaidDefinition } from "./types"
+import type { ActivityEntry, LeaderboardEntry, SportEvent, HousePool } from "./types"
 
-const emberfangBlade: LootItem = {
-  id: "emberfang-blade",
-  name: "Emberfang Blade",
-  slot: "weapon",
-  rarity: "Rare",
-  power: 8,
-  description: "A heat-etched saber that turns clean hits into finishing blows.",
-}
-
-const tidecallSigil: LootItem = {
-  id: "tidecall-sigil",
-  name: "Tidecall Sigil",
-  slot: "charm",
-  rarity: "Epic",
-  power: 10,
-  description: "A charm that softens boss strikes and bumps payout.",
-}
-
-const voidglassTotem: LootItem = {
-  id: "voidglass-totem",
-  name: "Voidglass Totem",
-  slot: "relic",
-  rarity: "Legendary",
-  power: 14,
-  description: "A relic pulled from the breach, still warm from the daily boss.",
-}
-
-const ashloopDagger: LootItem = {
-  id: "ashloop-dagger",
-  name: "Ashloop Dagger",
-  slot: "weapon",
-  rarity: "Common",
-  power: 4,
-  description: "Compact steel for short runs and quick clears.",
-}
-
-const echoTonic: LootItem = {
-  id: "echo-tonic",
-  name: "Echo Tonic",
-  slot: "charm",
-  rarity: "Rare",
-  power: 6,
-  description: "A tonic that gives some stamina back after a clean run.",
-}
-
-export const raidDefinitions: RaidDefinition[] = [
+// Mock Sport Events - Available betting markets
+export const mockSportEvents: SportEvent[] = [
   {
-    id: "reef-run",
-    name: "Reef Run",
-    enemyName: "Coral Marauder",
-    difficulty: "Easy",
-    synopsis: "Easy run for coins and streaks.",
-    theme: "Azure Reef",
-    ticketCost: 1,
-    energyCost: 12,
-    enemyMaxHp: 52,
-    rewardRange: [22, 36],
-    xpReward: 30,
-    bossModifier: "Current drift boosts critical attack damage.",
-    lootTable: [ashloopDagger, echoTonic],
+    match_id: 1,
+    sport: "Soccer",
+    homeTeam: "Arsenal",
+    awayTeam: "Liverpool",
+    start_time: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+    status: 0, // OPEN
+    current_exposure: 50000000, // 50 USDC in exposure
+    market_id: 0, // 1X2 market
+    odds: [180, 320, 240], // 1.80, 3.20, 2.40
+    suspended: false,
   },
   {
-    id: "forge-surge",
-    name: "Forge Surge",
-    enemyName: "Brass Hydra",
-    difficulty: "Medium",
-    synopsis: "Medium run with better drop odds.",
-    theme: "Molten Foundry",
-    ticketCost: 1,
-    energyCost: 18,
-    enemyMaxHp: 80,
-    rewardRange: [34, 56],
-    xpReward: 48,
-    bossModifier: "Heat spikes punish slow turns but reward aggressive specials.",
-    lootTable: [emberfangBlade, tidecallSigil],
+    match_id: 2,
+    sport: "Basketball",
+    homeTeam: "Lakers",
+    awayTeam: "Celtics",
+    start_time: Math.floor(Date.now() / 1000) + 7200, // 2 hours from now
+    status: 0,
+    current_exposure: 75000000,
+    market_id: 0,
+    odds: [210, 280, 210],
+    suspended: false,
   },
   {
-    id: "eclipse-altar",
-    name: "Eclipse Altar",
-    enemyName: "Nightglass Warden",
-    difficulty: "Boss",
-    synopsis: "Daily boss run. Short and punishing.",
-    theme: "Black Halo Citadel",
-    ticketCost: 2,
-    energyCost: 24,
-    enemyMaxHp: 104,
-    rewardRange: [64, 92],
-    xpReward: 78,
-    bossModifier: "The warden changes stance every turn, favoring guarded counterplay.",
-    lootTable: [tidecallSigil, voidglassTotem],
+    match_id: 3,
+    sport: "Tennis",
+    homeTeam: "Djokovic",
+    awayTeam: "Alcaraz",
+    start_time: Math.floor(Date.now() / 1000) + 5400, // 1.5 hours from now
+    status: 0,
+    current_exposure: 35000000,
+    market_id: 0,
+    odds: [220, 310, 190], // Player 1 favored
+    suspended: false,
+  },
+  {
+    match_id: 4,
+    sport: "Soccer",
+    homeTeam: "Manchester City",
+    awayTeam: "Manchester United",
+    start_time: Math.floor(Date.now() / 1000) + 10800, // 3 hours from now
+    status: 0,
+    current_exposure: 120000000,
+    market_id: 0,
+    odds: [175, 350, 260],
+    suspended: false,
+  },
+  {
+    match_id: 5,
+    sport: "Rugby",
+    homeTeam: "All Blacks",
+    awayTeam: "Springboks",
+    start_time: Math.floor(Date.now() / 1000) + 14400, // 4 hours from now
+    status: 0,
+    current_exposure: 65000000,
+    market_id: 0,
+    odds: [195, 320, 215],
+    suspended: false,
   },
 ]
 
-export const starterInventory: LootItem[] = [
-  {
-    id: "rookie-axe",
-    name: "Rookie Breach Axe",
-    slot: "weapon",
-    rarity: "Common",
-    power: 3,
-    description: "Starter steel for your first run.",
-  },
-  {
-    id: "signal-band",
-    name: "Signal Band",
-    slot: "charm",
-    rarity: "Common",
-    power: 2,
-    description: "Keeps your faction mark stable between runs.",
-  },
-]
+// Mock LP Pool State
+export const mockHousePool: HousePool = {
+  total_supply: 1000000, // 1M total LP shares minted
+  reserve_balance: 500000000, // 500M USDC in pool
+  locked_payouts: 120000000, // 120M USDC locked for pending payouts
+  max_match_exposure: 100000000, // Max 100M USDC exposure per match
+}
 
 export const starterActivity: ActivityEntry[] = [
   {
     id: "seed-1",
-    title: "Bridge primed",
-    detail: "Mock bridge loaded with 40 INIT for the demo.",
+    title: "Pool initialized",
+    detail: "Phantasma sportsbook launched with 500M USDC liquidity.",
     timestamp: "Just now",
     tone: "neutral",
   },
   {
     id: "seed-2",
-    title: "Daily boss online",
-    detail: "Nightglass Warden is live with a guarded-counter stance.",
-    timestamp: "6m ago",
+    title: "Arsenal vs Liverpool",
+    detail: "1X2 market open with odds 1.80 / 3.20 / 2.40.",
+    timestamp: "2m ago",
     tone: "warning",
+  },
+  {
+    id: "seed-3",
+    title: "Lakers vs Celtics",
+    detail: "Championship matchup now live for betting.",
+    timestamp: "5m ago",
+    tone: "neutral",
   },
 ]
 
 export const rivalLeaderboard: LeaderboardEntry[] = [
   {
-    id: "scarlet",
-    username: "scarlet.raid",
-    score: 1280,
-    streak: 7,
-    totalLoot: 412,
-    faction: "Red Wake",
+    id: "whale-1",
+    address: "0x1a2b3c4d5e6f7g8h9i0j",
+    totalVolume: 5280000,
+    winRate: 0.62,
+    profitLoss: 850000,
+    lpReturns: 45000,
+    highlight: true,
   },
   {
-    id: "hexa",
-    username: "hexa.init",
-    score: 1170,
-    streak: 5,
-    totalLoot: 364,
-    faction: "Frost Relay",
+    id: "bettor-2",
+    address: "0x2k3l4m5n6o7p8q9r0s1t",
+    totalVolume: 3170000,
+    winRate: 0.58,
+    profitLoss: 420000,
+    lpReturns: 28000,
   },
   {
-    id: "morrow",
-    username: "morrow.loop",
-    score: 1098,
-    streak: 4,
-    totalLoot: 338,
-    faction: "Dusk Choir",
+    id: "sharp-3",
+    address: "0x3u4v5w6x7y8z9a0b1c2d",
+    totalVolume: 2898000,
+    winRate: 0.71,
+    profitLoss: 680000,
+    lpReturns: 52000,
   },
 ]
