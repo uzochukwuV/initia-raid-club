@@ -1,5 +1,14 @@
 export type Screen = "dashboard" | "betting" | "liquidity" | "leaderboard" | "log"
 
+// Raid Definition - Legacy raid/encounter system
+export type RaidDefinition = {
+  raidId: string
+  name: string
+  enemyMaxHp: number
+  rewardRange: [number, number]
+  difficulty: "normal" | "hard" | "nightmare"
+}
+
 // Betting Outcomes and Statuses
 export type BetOutcome = 0 | 1 | 2 // 0=Home, 1=Draw, 2=Away
 
