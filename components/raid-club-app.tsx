@@ -2,257 +2,147 @@
 
 import { useState } from "react"
 import { RaidClubBrandMark } from "@/components/raid-club-logo"
-import { ActivityLog } from "@/features/profile/activity-log"
-import { HomeBase } from "@/features/profile/home-base"
-import { LeaderboardPanel } from "@/features/leaderboard/leaderboard-panel"
+import { BottomNav, type Page } from "@/components/bottom-nav"
+import { Sidebar } from "@/components/sidebar"
+import { MarketsPage } from "@/components/pages/markets-page"
+import { LivePage } from "@/components/pages/live-page"
+import { MyBetsPage } from "@/components/pages/my-bets-page"
+import { AccountPage } from "@/components/pages/account-page"
 import { isMainnetRuntimeConfigured } from "@/lib/initia/config"
 import { buildMockLeaderboard, usePhantasmaStore } from "@/lib/game/store"
-import type { ActivityEntry, LeaderboardEntry, NativeFeatureStatus, Screen, UserProfile } from "@/lib/game/types"
-
-const tabs: Array<{ id: Screen; label: string }> = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "betting", label: "Betting" },
-  { id: "liquidity", label: "Liquidity" },
-  { id: "leaderboard", label: "Board" },
-  { id: "log", label: "Log" },
-]
+import type { UserProfile } from "@/lib/game/types"
 
 export function RaidClubApp() {
   return isMainnetRuntimeConfigured ? <MainnetPhantasmaApp /> : <MockPhantasmaApp />
 }
 
-type ControlAction = {
-  label: string
-  onClick: () => void
-}
-
-type ShellRuntime = {
-  screen: Screen
-  user: UserProfile
-  activity: ActivityEntry[]
-  nativeFeatures: NativeFeatureStatus
-  leaderboard: LeaderboardEntry[]
-  setScreen: (screen: Screen) => void
-  connectWallet: () => void
-  depositBalance: () => void
-  addLiquidity: () => void
-  requestWithdraw: () => void
-  selectEvent: (eventId: number) => void
-  resetDemo: () => void
-  headerBadges: string[]
-  identityTitle: string
-  identityHelp: string
-  footerTitle: string
-  footerPoints: string[]
-}
-
 function MockPhantasmaApp() {
-  const [selectedEventId, setSelectedEventId] = useState<number | null>(null)
-  const screen = usePhantasmaStore((s) => s.screen)
+  const [currentPage, setCurrentPage] = useState<Page>("markets")
+
   const user = usePhantasmaStore((s) => s.user)
-  const activity = usePhantasmaStore((s) => s.activity)
-  const nativeFeatures = usePhantasmaStore((s) => s.nativeFeatures)
-  const setScreen = usePhantasmaStore((s) => s.setScreen)
   const connectWallet = usePhantasmaStore((s) => s.connectWallet)
   const depositBalance = usePhantasmaStore((s) => s.depositBalance)
   const addLiquidity = usePhantasmaStore((s) => s.addLiquidity)
-  const requestWithdraw = usePhantasmaStore((s) => s.requestWithdraw)
   const resetDemo = usePhantasmaStore((s) => s.resetDemo)
-  const leaderboard = buildMockLeaderboard(user)
 
-  const runtime: ShellRuntime = {
-    screen,
-    user,
-    activity,
-    nativeFeatures,
-    leaderboard,
-    setScreen,
-    connectWallet: () => {
-      if (!user.address) {
-        connectWallet("0x1a2b3c4d5e6f7g8h9i0j")
-      }
-    },
-    depositBalance: () => depositBalance(100),
-    addLiquidity: () => addLiquidity(500),
-    requestWithdraw: () => requestWithdraw(10),
-    selectEvent: (eventId) => {
-      setSelectedEventId(eventId)
-      setScreen("betting")
-    },
-    resetDemo,
-    headerBadges: ["Mainnet", "Phantasma", "Auto-signing"],
-    identityTitle: "Sportsbook Status",
-    identityHelp: "Connected to Phantasma prediction market.",
-    footerTitle: "How to Play",
-    footerPoints: [
-      "1. Connect your wallet to the Phantasma appchain.",
-      "2. Place 1X2 bets (Home/Draw/Away) against the shared House Pool.",
-      "3. Build multi-leg parlays for higher payouts.",
-      "4. Provide liquidity as an LP to earn returns.",
-    ],
+  const handleOddsClick = (matchId: number, outcome: 0 | 1 | 2) => {
+    console.log(`Odds clicked: Match ${matchId}, Outcome ${outcome}`)
   }
 
-  return <PhantasmaShell runtime={runtime} />
-}
-
-function MainnetPhantasmaApp() {
-  return (
-    <main className="raid-shell relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 grid-noise" />
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[1520px] items-center px-5 md:px-8 xl:px-10">
-        <div className="w-full border-t border-white/10 pt-6">
-          <p className="section-code text-[10px] text-[#8f877c]">Mainnet</p>
-          <h1 className="editorial-title mt-4 text-[4rem] leading-[0.9] text-[#f3eee4] md:text-[5.5rem]">Phantasma</h1>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-[#c7c0b5]">
-            Connected to mainnet. Loading wallet state and market data from the Phantasma contract.
-          </p>
-        </div>
-      </div>
-    </main>
-  )
-}
-
-type PhantasmaShellProps = {
-  runtime: ShellRuntime
-}
-
-function PhantasmaShell({ runtime }: PhantasmaShellProps) {
-  const identityActions: ControlAction[] = [
-    { label: "Connect wallet", onClick: runtime.connectWallet },
-    { label: "Deposit 100 USDC", onClick: runtime.depositBalance },
-    { label: "Add liquidity", onClick: runtime.addLiquidity },
-  ]
+  const handleConnectWallet = () => {
+    if (!user.address) {
+      connectWallet("0x1a2b3c4d5e6f7g8h9i0j")
+    }
+  }
 
   return (
-    <main className="raid-shell relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 grid-noise" />
-
-      <header className="border-b border-white/10">
-        <div className="relative mx-auto flex w-full max-w-[1520px] items-center justify-between gap-8 px-5 py-6 md:px-8 xl:px-10">
-          <div className="flex items-center gap-6">
-            <RaidClubBrandMark className="h-14 w-14 flex-shrink-0" />
-            <div className="border-l border-white/10 pl-6">
+    <main className="min-h-screen bg-[#0f0d0a]">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#0f0d0a]/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <RaidClubBrandMark className="h-10 w-10" />
+            <div>
               <h1 className="font-bold text-[#f3eee4]">Phantasma</h1>
-              <p className="text-xs text-[#8f877c]">Onchain Sportsbook</p>
+              <p className="text-xs text-[#8f877c]">Sportsbook</p>
             </div>
           </div>
 
           <div className="flex gap-2">
-            {runtime.headerBadges.map((badge) => (
-              <span key={badge} className="rounded bg-white/5 px-3 py-1 text-xs text-[#8f877c]">
-                {badge}
+            <span className="rounded bg-white/5 px-3 py-1 text-xs text-[#8f877c]">
+              Demo
+            </span>
+            {user.address && (
+              <span className="rounded bg-white/5 px-3 py-1 text-xs text-[#d7b37b]">
+                {user.address.slice(0, 6)}...
               </span>
-            ))}
+            )}
           </div>
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-[1520px] gap-6 px-5 py-8 md:px-8 xl:px-10">
-        <div className="flex-1">
-          {runtime.screen === "dashboard" && (
-            <HomeBase
-              user={runtime.user}
-              nativeFeatures={runtime.nativeFeatures}
-              onConnectWallet={runtime.connectWallet}
-              onDepositBalance={runtime.depositBalance}
-              onAddLiquidity={runtime.addLiquidity}
-              onRequestWithdraw={runtime.requestWithdraw}
-              onSelectEvent={runtime.selectEvent}
+      {/* Sidebar */}
+      <Sidebar>
+        <div>
+          <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+            Account
+          </p>
+          <p className="text-sm font-semibold text-[#f3eee4] mt-2">
+            {user.address ? `${user.address.slice(0, 6)}...` : "Not Connected"}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-xs text-[#8f877c] uppercase tracking-wider">
+            Quick Stats
+          </div>
+          <div className="space-y-1 text-xs">
+            <div className="flex justify-between text-[#c7c0b5]">
+              <span>Balance:</span>
+              <span className="text-[#d7b37b]">{user.balanceUSDC} USDC</span>
+            </div>
+            <div className="flex justify-between text-[#c7c0b5]">
+              <span>Win Rate:</span>
+              <span className="text-[#d7b37b]">
+                {Math.round(user.winRate * 100)}%
+              </span>
+            </div>
+            <div className="flex justify-between text-[#c7c0b5]">
+              <span>LP Shares:</span>
+              <span className="text-[#d7b37b]">{user.lpShares}</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={resetDemo}
+          className="w-full rounded bg-white/8 py-2 px-3 text-xs text-[#8f877c] hover:text-[#c7c0b5] transition"
+        >
+          Reset Demo
+        </button>
+      </Sidebar>
+
+      {/* Main Content */}
+      <div className="pt-20 pb-24 lg:ml-80">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+          {currentPage === "markets" && (
+            <MarketsPage onOddsClick={handleOddsClick} />
+          )}
+          {currentPage === "live" && (
+            <LivePage onOddsClick={handleOddsClick} />
+          )}
+          {currentPage === "my-bets" && <MyBetsPage user={user} />}
+          {currentPage === "account" && (
+            <AccountPage
+              user={user}
+              onConnectWallet={handleConnectWallet}
+              onDepositBalance={() => depositBalance(100)}
+              onAddLiquidity={() => addLiquidity(500)}
             />
           )}
-
-          {runtime.screen === "leaderboard" && <LeaderboardPanel leaderboard={runtime.leaderboard} />}
-
-          {runtime.screen === "log" && <ActivityLog entries={runtime.activity} />}
-
-          {runtime.screen === "betting" && (
-            <div className="rounded border border-white/10 bg-white/3 p-8 text-center">
-              <p className="text-[#c7c0b5]">Betting panel coming soon</p>
-            </div>
-          )}
-
-          {runtime.screen === "liquidity" && (
-            <div className="rounded border border-white/10 bg-white/3 p-8 text-center">
-              <p className="text-[#c7c0b5]">Liquidity management panel coming soon</p>
-            </div>
-          )}
         </div>
-
-        <aside className="w-80 flex-shrink-0 space-y-6">
-          <div className="paper-panel p-6">
-            <p className="section-code text-[10px] text-[#8f877c]">{runtime.identityTitle}</p>
-            <p className="editorial-title mt-4 text-[1.5rem] leading-[0.9] text-[#f3eee4]">
-              {runtime.user.address ? `${runtime.user.address.slice(0, 6)}...${runtime.user.address.slice(-4)}` : "Disconnected"}
-            </p>
-            <p className="mt-3 text-[13px] leading-6 text-[#d0c8bb]">{runtime.identityHelp}</p>
-
-            <div className="mt-6 flex flex-col gap-2">
-              {identityActions.map((action) => (
-                <button
-                  key={action.label}
-                  onClick={action.onClick}
-                  className="rounded bg-white/8 py-2 px-4 text-sm text-[#d7b37b] transition hover:bg-white/12"
-                >
-                  {action.label}
-                </button>
-              ))}
-              <button
-                onClick={runtime.resetDemo}
-                className="mt-4 text-xs text-[#6b6460] underline transition hover:text-[#8f877c]"
-              >
-                Reset demo
-              </button>
-            </div>
-          </div>
-
-          <nav className="flex flex-col gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => runtime.setScreen(tab.id)}
-                className={`rounded px-4 py-3 text-left text-sm transition ${
-                  runtime.screen === tab.id ? "bg-white/8 text-[#f3eee4]" : "text-[#a9a193] hover:text-[#d0c8bb]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
       </div>
 
-      <footer className="border-t border-white/10">
-        <div className="relative mx-auto w-full max-w-[1520px] px-5 py-8 md:px-8 xl:px-10">
-          <div className="grid gap-8 sm:grid-cols-2">
-            <div>
-              <p className="section-code text-[10px] text-[#8f877c]">{runtime.footerTitle}</p>
-              <ul className="mt-4 space-y-3 text-sm leading-7 text-[#d0c8bb]">
-                {runtime.footerPoints.map((point, i) => (
-                  <li key={i}>{point}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <p className="section-code text-[10px] text-[#8f877c]">Quick Stats</p>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[#8f877c]">Balance</dt>
-                  <dd className="font-mono text-[#d7b37b]">{runtime.user.balanceUSDC} USDC</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[#8f877c]">Win Rate</dt>
-                  <dd className="font-mono text-[#d7b37b]">{Math.round(runtime.user.winRate * 100)}%</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-[#8f877c]">LP Value</dt>
-                  <dd className="font-mono text-[#d7b37b]">${runtime.user.lpValue}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Bottom Navigation */}
+      <BottomNav currentPage={currentPage} onPageChange={setCurrentPage} />
     </main>
   )
 }
+
+function MainnetPhantasmaApp() {
+  return (
+    <main className="min-h-screen bg-[#0f0d0a] flex items-center justify-center">
+      <div className="text-center px-4">
+        <p className="text-xs text-[#8f877c] uppercase tracking-wider">
+          Mainnet
+        </p>
+        <h1 className="mt-4 text-4xl font-bold text-[#f3eee4]">Phantasma</h1>
+        <p className="mt-4 text-sm text-[#c7c0b5] max-w-md">
+          Connected to mainnet. Loading wallet state and market data from the
+          Phantasma contract.
+        </p>
+      </div>
+    </main>
+  )
+}
+
