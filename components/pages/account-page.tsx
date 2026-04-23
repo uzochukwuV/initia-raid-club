@@ -4,14 +4,12 @@ import type { UserProfile } from "@/lib/game/types"
 
 type AccountPageProps = {
   user: UserProfile
-  onConnectWallet: () => void
   onDepositBalance: () => void
   onAddLiquidity: () => void
 }
 
 export function AccountPage({
   user,
-  onConnectWallet,
   onDepositBalance,
   onAddLiquidity,
 }: AccountPageProps) {
@@ -74,16 +72,9 @@ export function AccountPage({
 
       <div className="space-y-3">
         <button
-          onClick={onConnectWallet}
-          disabled={!!user.address}
-          className="w-full rounded-lg bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
-        >
-          {user.address ? "Wallet Connected" : "Connect Wallet"}
-        </button>
-        <button
           onClick={onDepositBalance}
           disabled={!user.address}
-          className="w-full rounded-lg bg-gray-100 text-blue-600 py-3 font-semibold hover:bg-gray-200 transition disabled:text-gray-500 disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-blue-600 text-white py-3 font-semibold hover:bg-blue-700 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           Deposit 100 USDC
         </button>

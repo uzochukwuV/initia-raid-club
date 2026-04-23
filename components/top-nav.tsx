@@ -1,15 +1,13 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useAccount, useConnect, useDisconnect } from "wagmi"
 
 export type Page = "markets" | "live" | "my-bets" | "account"
 
 type TopNavProps = {
   currentPage: Page
   onPageChange: (page: Page) => void
-  walletAddress?: string
-  balance?: number
-  onConnectWallet: () => void
 }
 
 const menuItems: Array<{ id: Page; label: string }> = [
@@ -22,12 +20,12 @@ const menuItems: Array<{ id: Page; label: string }> = [
 export function TopNav({
   currentPage,
   onPageChange,
-  walletAddress,
-  balance,
-  onConnectWallet,
 }: TopNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { address, isConnected } = useAccount()
+  const { connect, connectors } = useConnect()
+  const { disconnect } = useDisconnect()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -45,9 +43,20 @@ export function TopNav({
     setIsOpen(false)
   }
 
+  const handleWalletClick = () => {
+    if (isConnected) {
+      disconnect()
+    } else {
+      const connector = connectors[0]
+      if (connector) {
+        connect({ connector })
+      }
+    }
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-full items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <h1 className="font-bold text-lg text-[#1a1a1a]">Phantasma</h1>
 
@@ -83,17 +92,15 @@ export function TopNav({
 
         {/* Wallet Button */}
         <button
-          onClick={onConnectWallet}
+          onClick={handleWalletClick}
           className="flex items-center gap-2 rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 transition"
         >
-          {walletAddress ? (
+          {isConnected && address ? (
             <>
-              <span className="text-xs">{walletAddress.slice(0, 6)}...</span>
-              {balance && (
-                <span className="text-xs bg-white/20 rounded px-2 py-0.5">
-                  {balance} USDC
-                </span>
-              )}
+              <span className="text-xs">
+                {address.slice(0, 6)}...{address.slice(-4)}
+              </span>
+              <span className="text-xs bg-white/20 rounded px-2 py-0.5">initia</span>
             </>
           ) : (
             "Connect Wallet"
