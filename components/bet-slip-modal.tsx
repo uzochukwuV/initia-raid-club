@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import type { BettingSession } from "@/lib/game/types"
+import { mockSportEvents } from "@/lib/game/data"
 
 type BetSlipModalProps = {
   isOpen: boolean
@@ -80,7 +81,7 @@ export function BetSlipModal({
             </h3>
 
             {bettingSession.selections.map((selection, index) => {
-              const match = undefined // In a real app, get match details from store
+              const match = mockSportEvents.find((m) => m.match_id === selection.match_id)
               const outcomes = ["Home", "Draw", "Away"]
               const odds = (selection.odds / 10000).toFixed(2)
 
@@ -91,7 +92,7 @@ export function BetSlipModal({
                 >
                   <div className="flex-1">
                     <p className="font-medium text-[#1a1a1a]">
-                      Match #{selection.match_id}
+                      {match ? `${match.homeTeam} vs ${match.awayTeam}` : `Match #${selection.match_id}`}
                     </p>
                     <p className="text-sm text-gray-600">
                       {outcomes[selection.outcome_id]} @ {odds}
@@ -114,7 +115,9 @@ export function BetSlipModal({
               Parlay Odds
             </p>
             <p className="text-2xl font-bold text-blue-600">
-              {(bettingSession.potential_payout / Math.max(bettingSession.stake, 1)).toFixed(2)}x
+              {bettingSession.stake > 0 
+                ? (bettingSession.potential_payout / Math.max(bettingSession.stake, 1)).toFixed(2)
+                : "—"}x
             </p>
           </div>
 

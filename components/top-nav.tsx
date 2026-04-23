@@ -23,10 +23,13 @@ export function TopNav({
 }: TopNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  
+  // Wagmi hooks for wallet connection
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
 
+  // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -46,13 +49,12 @@ export function TopNav({
   const handleWalletClick = () => {
     if (isConnected) {
       disconnect()
-    } else {
-      const connector = connectors[0]
-      if (connector) {
-        connect({ connector })
-      }
+    } else if (connectors.length > 0) {
+      connect({ connector: connectors[0] })
     }
   }
+
+  const displayAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Connect Wallet"
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
@@ -95,11 +97,9 @@ export function TopNav({
           onClick={handleWalletClick}
           className="flex items-center gap-2 rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 transition"
         >
-          {isConnected && address ? (
+          {isConnected ? (
             <>
-              <span className="text-xs">
-                {address.slice(0, 6)}...{address.slice(-4)}
-              </span>
+              <span className="text-xs">{address?.slice(0, 6)}</span>
               <span className="text-xs bg-white/20 rounded px-2 py-0.5">initia</span>
             </>
           ) : (

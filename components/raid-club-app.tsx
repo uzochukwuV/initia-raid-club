@@ -33,6 +33,7 @@ function MockPhantasmaApp() {
     if (match) {
       addSelectionToBet({
         match_id: matchId,
+        market_id: match.market_id,
         outcome_id: outcome,
         odds: match.odds[outcome],
       })
